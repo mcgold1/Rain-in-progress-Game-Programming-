@@ -3,8 +3,10 @@ package com.mcgold1.rain.entity.mob;
 import com.mcgold1.rain.Game;
 import com.mcgold1.rain.entity.projectile.Projectile;
 import com.mcgold1.rain.entity.projectile.WizardProjectile;
+import com.mcgold1.rain.graphics.AnimatedSprite;
 import com.mcgold1.rain.graphics.Screen;
 import com.mcgold1.rain.graphics.Sprite;
+import com.mcgold1.rain.graphics.SpriteSheet;
 import com.mcgold1.rain.input.Keyboard;
 import com.mcgold1.rain.input.Mouse;
 
@@ -15,11 +17,16 @@ public class Player extends Mob {
 	private int anim = 0;
 	private boolean walking;
 	private int fireRate = 0;
-	
+	private AnimatedSprite down = new AnimatedSprite(SpriteSheet.player_down, 32, 32, 3);
+	private AnimatedSprite up = new AnimatedSprite(SpriteSheet.player_up, 32, 32, 3);
+	private AnimatedSprite left = new AnimatedSprite(SpriteSheet.player_left, 32, 32, 3);
+	private AnimatedSprite right = new AnimatedSprite(SpriteSheet.player_right, 32, 32, 3);
+
+	private AnimatedSprite animSprite = down;
 	
 	public Player(Keyboard input){
 		this.input = input;
-		sprite = Sprite.player_forward;
+
 	}
 	
 	public Player(int x, int y, Keyboard input){	
@@ -32,14 +39,28 @@ public class Player extends Mob {
 	}
 	
 	public void update(){
+		if(walking)animSprite.update();
+		else animSprite.setFrame(0);
 		if (fireRate > 0) fireRate --;
 		int xa = 0, ya = 0;
 		if (anim < 7500) anim++; 
 		else anim = 0;
-		if(input.up) ya --;
-		if(input.down) ya ++;
-		if(input.left) xa --;
-		if(input.right) xa ++;
+		if(input.up){ 
+			ya --;
+			animSprite = up;
+		}
+		if(input.down) {
+			ya ++;
+			animSprite = down;
+		}
+		if(input.left) {
+			xa --;
+			animSprite = left;
+		}
+		if(input.right) {
+			xa ++;
+			animSprite = right;
+		}
 		
 		if(xa != 0 || ya != 0) {
 			move(xa, ya);
@@ -72,7 +93,7 @@ public class Player extends Mob {
 
 	public void render(Screen screen){
 		int filp = 0;
-		if(dir == 0){
+		/*if(dir == 0){
 			sprite = Sprite.player_forward;
 			if(walking){
 				if (anim % 40 > 10 && anim % 40 <=20){
@@ -107,8 +128,8 @@ public class Player extends Mob {
 				}
 			 }
 					
-		}
-		if(dir == 3) filp = 1;
+		}*/
+		sprite = animSprite.getSprite();
 		screen.renderPlayer(x-16, y-16, sprite, filp);
 
 	}
